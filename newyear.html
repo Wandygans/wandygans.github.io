@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>For Mira - Wandy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&family=Caveat:wght@600&family=Indie+Flower&display=swap" rel="stylesheet">
+    <style>
+        :root { --dark-sky: #0b0d17; --pink-main: #ff85a1; --pink-dark: #ff4d6d; --blue-line: #a2d2ff; }
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+        body { margin: 0; overflow-x: hidden; font-family: 'Quicksand', sans-serif; background: var(--dark-sky); height: 100vh; color: white; scroll-behavior: smooth; }
+
+        /* 1. BACKGROUND */
+        #night-sky { position: fixed; inset: 0; pointer-events: none; z-index: -1; background: radial-gradient(circle at bottom, #1b1d2e 0%, #0b0d17 100%); }
+        .star { position: absolute; background: white; border-radius: 50%; animation: twinkle var(--d) infinite; }
+        @keyframes twinkle { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.2); } }
+        .firework { position: absolute; width: 4px; height: 4px; border-radius: 50%; animation: explode 2s ease-out forwards; pointer-events: none; }
+        @keyframes explode { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(25); opacity: 0; } }
+
+        /* 2. AMPLOP BERDETAK */
+        #envelope-dvd { position: fixed; width: 300px; height: 160px; left: 50%; top: 60%; transform: translate(-50%, -50%); z-index: 100; cursor: pointer; transition: top 1.5s cubic-bezier(0.6, -0.28, 0.735, 0.045); }
+        .heartbeat { animation: hb 1.2s infinite ease-in-out; }
+        @keyframes hb { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.1); } }
+        .env-body { width: 100%; height: 100%; background: var(--pink-main); border-radius: 0 0 15px 15px; position: relative; }
+        .flap { position: absolute; top: 0; width: 0; height: 0; border-left: 150px solid transparent; border-right: 150px solid transparent; border-top: 100px solid var(--pink-dark); transform-origin: top; transition: 0.8s; z-index: 110; }
+        .is-open .flap { transform: rotateX(180deg); }
+
+        /* 3. NOTEPAD */
+        .letter {
+            position: fixed; left: 50%; top: 50%; width: 330px; height: 520px; 
+            background: white; border-radius: 8px; z-index: 105; opacity: 0; visibility: hidden; 
+            transform: translate(-50%, 100vh); transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); overflow: hidden;
+        }
+        .notepad-content {
+            padding: 40px 20px 20px 50px; height: 100%;
+            background-image: repeating-linear-gradient(white, white 29px, var(--blue-line) 30px);
+            background-size: 100% 30px; font-family: 'Indie Flower', cursive; color: #333; line-height: 30px;
+        }
+        .spiral { position: absolute; left: 12px; top: 0; bottom: 0; width: 20px; display: flex; flex-direction: column; justify-content: space-around; padding: 15px 0; z-index: 5; }
+        .ring { width: 13px; height: 13px; background: #e0e0e0; border-radius: 50%; border: 2px solid #bbb; }
+        .letter.active { opacity: 1; visibility: visible; transform: translate(-50%, -52%); }
+        .letter.exit { transform: translate(-50%, 120vh); opacity: 0; }
+        .cursor-batang { border-left: 3px solid var(--pink-dark); margin-left: 2px; animation: blink 0.7s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* NAMA FADE IN 3 DETIK */
+        #from-wandy { 
+            opacity: 0; 
+            text-align: right; 
+            font-size: 22px; 
+            margin-top: 5px; 
+            color: var(--pink-dark); 
+            font-weight: bold;
+            transition: opacity 3s ease-in; 
+        }
+
+        /* 4. GALERI & FINAL */
+        #recap-section { display: none; min-height: 100vh; flex-direction: column; align-items: center; padding: 60px 20px; }
+        .stack-item { width: 250px; opacity: 0; filter: blur(10px); transform: translateY(100px); transition: 2s; margin-bottom: 120px; }
+        .stack-item.show { opacity: 1; filter: blur(0); transform: translateY(0) rotate(var(--r)); }
+        .photo-frame { background: white; padding: 10px; border-radius: 5px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); color: var(--pink-dark); text-align: center; font-family: 'Caveat'; }
+        .photo-frame img { width: 100%; height: 300px; object-fit: cover; }
+        #final-slide { position: fixed; inset: 0; display: none; background: var(--dark-sky); z-index: 2000; flex-direction: column; align-items: center; justify-content: center; }
+        #reset-cover { position: fixed; inset: 0; display: none; background: rgba(11, 13, 23, 0.98); z-index: 3000; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+        .btn-style { padding: 15px 40px; border-radius: 30px; border: none; font-weight: bold; cursor: pointer; color: white; }
+    </style>
+</head>
+<body>
+
+    <div id="night-sky"></div>
+    <audio id="bgMusic" loop><source src="https://github.com/Wandygans/b/raw/refs/heads/main/Nadin%20Amizah%20-%20Semua%20Aku%20Dirayakan%20(Official%20Music%20Video).mp3" type="audio/mpeg"></audio>
+
+    <div id="hint-layer" style="position:fixed; top:15%; width:100%; text-align:center; z-index: 50;">
+        <h2 style="font-family:'Caveat'; font-size:28px;">Buka dong Mira!</h2>
+        <span style="font-size:40px; display:block; animation:bounce 1s infinite;">👇</span>
+    </div>
+
+    <div id="customAlert" style="position:fixed; inset:0; display:none; justify-content:center; align-items:center; z-index:9999; backdrop-filter:blur(8px); background:rgba(0,0,0,0.6);">
+        <div style="background:white; padding:25px; border-radius:20px; text-align:center; width:85%; max-width:320px; color:#333;">
+            <h3>Pesan dari Gueh</h3>
+            <p>Gedein volume ya Mira! 🔊</p>
+            <div style="cursor:pointer; display:flex; justify-content:center; gap:10px; margin:15px 0;" onclick="toggleCheck()">
+                <div id="checkbox" style="width:22px; height:22px; border:2px solid var(--pink-main); border-radius:4px;"></div><b>Ngerti kan?</b>
+            </div>
+            <button id="okBtn" style="background:#ddd; border:none; padding:12px; border-radius:20px; width:100%; color:white; pointer-events:none;" onclick="confirmAlert()">Oke (3)</button>
+        </div>
+    </div>
+
+    <div id="envelope-dvd" class="heartbeat" onclick="if(!isOpen)openAlert()">
+        <div class="env-body" id="env-main">
+            <div class="flap"></div>
+            <div style="position: absolute; inset: 0; z-index: 120; display: flex; justify-content: center; align-items: center; color: white; font-size: 45px; pointer-events: none;">❤️</div>
+        </div>
+    </div>
+
+    <div class="letter" id="paper">
+        <div class="spiral">
+            <div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="ring"></div>
+            <div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="ring"></div>
+            <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+        </div>
+        <div class="notepad-content">
+            <div style="text-align:right; font-size:13px; margin-bottom:10px; color: #888;">01/01/2026</div>
+            <span id="typing-box"></span><span id="cursor" class="cursor-batang"></span>
+            <div id="from-wandy">From Wandy</div>
+        </div>
+    </div>
+
+    <div id="recap-section">
+        <h2 style="font-family: 'Caveat'; font-size: 35px; margin-bottom: 50px;">Gatau ini apa ✨</h2>
+        <div id="gallery-target" style="display:flex; flex-direction:column; width:100%;"></div>
+        <button class="btn-style" style="background:var(--pink-main); margin-top:50px;" onclick="goFinal()">Lanjutkan 🚀</button>
+    </div>
+
+    <div id="final-slide">
+        <h1 style="font-family: 'Caveat'; font-size: 38px;">Kita ini sebenarnya apa?</h1>
+        <div style="position:relative; width:100%; height:200px; margin-top:30px;">
+            <button class="btn-style" style="background:#888; left:10%; position:absolute;" onclick="showResetCover('Teman')">Teman</button>
+            <button id="btnPacar" class="btn-style" style="background:var(--pink-main); right:10%; position:absolute;" onmouseover="moveBtn()" onclick="moveBtn()">Pacar</button>
+        </div>
+    </div>
+
+    <div id="reset-cover">
+        <h2 id="final-msg" style="font-family:'Caveat'; font-size:45px; color:var(--pink-main);"></h2>
+        <p>Semangat terus Calon Dokter 🤘🏼✨</p>
+        <button class="btn-style" style="background:var(--pink-main); margin-top:30px;" onclick="location.reload()">Putar Ulang ↩️</button>
+    </div>
+
+    <script>
+        // STARS
+        const sky = document.getElementById('night-sky');
+        for(let i=0; i<100; i++) {
+            const s = document.createElement('div'); s.className = 'star';
+            s.style.left = Math.random()*100+'vw'; s.style.top = Math.random()*100+'vh';
+            s.style.width = s.style.height = Math.random()*3+'px';
+            s.style.setProperty('--d', Math.random()*5+2+'s'); sky.appendChild(s);
+        }
+        setInterval(() => {
+            const f = document.createElement('div'); f.className = 'firework';
+            f.style.left = Math.random()*100+'vw'; f.style.top = Math.random()*100+'vh';
+            f.style.background = `hsl(${Math.random()*360}, 100%, 50%)`; sky.appendChild(f);
+            setTimeout(() => f.remove(), 2000);
+        }, 1200);
+
+        const photos = [
+            {src: "https://raw.githubusercontent.com/Wandygans/b/refs/heads/main/IMG_20251231_093157.jpg", cap: "Mira dengan pialanya 🏆"},
+            {src: "https://raw.githubusercontent.com/Wandygans/b/refs/heads/main/IMG-20251229-WA0003.jpg", cap: "Mira dengan Kacamatanya 👓"},
+            {src: "https://raw.githubusercontent.com/Wandygans/b/refs/heads/main/IMG-20251128-WA0008.jpg", cap: "Gataulah 😆"},
+            {src: "https://raw.githubusercontent.com/Wandygans/b/refs/heads/main/IMG-20251224-WA0034.jpg", cap: "Calon dokter 👩‍⚕️"}
+        ];
+        const target = document.getElementById('gallery-target');
+        photos.forEach((p, idx) => {
+            const div = document.createElement('div'); div.className = 'stack-item';
+            div.style.setProperty('--r', (idx % 2 === 0 ? '-5deg' : '5deg'));
+            div.style.alignSelf = (idx % 2 === 0 ? 'flex-start' : 'flex-end');
+            div.innerHTML = `<div class="photo-frame"><img src="${p.src}"><div>${p.cap}</div></div>`;
+            target.appendChild(div);
+        });
+
+        let isOpen = false, isChecked = false, isMoving = false;
+        let pX = window.innerWidth/2, pY = window.innerHeight*0.6, vX = 0.8, vY = 0.8;
+        const env = document.getElementById('envelope-dvd');
+        const paper = document.getElementById('paper');
+
+        function toggleCheck() {
+            if (isChecked) return; isChecked = true;
+            document.getElementById('checkbox').style.background = 'var(--pink-main)';
+            document.getElementById('checkbox').innerHTML = '✔️';
+            let count = 3;
+            const timer = setInterval(() => {
+                count--; document.getElementById('okBtn').innerText = `Oke (${count})`;
+                if(count <= 0) { clearInterval(timer); document.getElementById('okBtn').style.background = 'var(--pink-main)'; document.getElementById('okBtn').style.pointerEvents = 'auto'; document.getElementById('okBtn').innerText = "Oke!"; }
+            }, 1000);
+        }
+
+        function openAlert() { document.getElementById('customAlert').style.display = 'flex'; }
+
+        function confirmAlert() {
+            isOpen = true; 
+            document.getElementById('customAlert').style.display = 'none';
+            document.getElementById('hint-layer').style.display = 'none';
+            document.getElementById('bgMusic').play();
+            env.classList.remove('heartbeat');
+            document.getElementById('env-main').classList.add('is-open');
+            paper.classList.add('active');
+            setTimeout(() => { isMoving = true; dvdAnimate(); type(); }, 1500);
+        }
+
+        function dvdAnimate() {
+            if (isMoving) {
+                pX += vX; pY += vY;
+                if (pX <= 150 || pX >= window.innerWidth - 150) vX *= -1;
+                if (pY <= 80 || pY >= window.innerHeight - 80) vY *= -1;
+                env.style.left = pX + 'px'; env.style.top = pY + 'px';
+            }
+            requestAnimationFrame(dvdAnimate);
+        }
+
+        const msg = "Halo miraa, wedeh dah tahun 2026 aja yakkk, haha lu keren tau ra bisa bertahan sampai sekarang mungkin banyak cobaan yang membuat lu harus jatuh bangun dan congrats buat pecapaian lu ditahun ini udah juara ayat mas ahahaha 😂, ditahun 2026 ini lu harus lebih kuat lagi dan lebih semangat lagi ya mira, lu keren gua bangga hahaha katanya mau jadi dokter harus semangat, semangat terus mira biar jadi dokter 🤘🏼✨.";
+        let i = 0;
+        function type() {
+            if (i < msg.length) {
+                document.getElementById("typing-box").innerHTML += msg.charAt(i);
+                i++; setTimeout(type, 250);
+            } else {
+                document.getElementById('cursor').style.display = 'none';
+                document.getElementById('from-wandy').style.opacity = '1';
+                setTimeout(closeEverything, 6000);
+            }
+        }
+
+        function closeEverything() {
+            paper.classList.add('exit');
+            setTimeout(() => {
+                isMoving = false;
+                env.style.top = "150vh";
+                setTimeout(() => {
+                    env.style.display = 'none';
+                    document.getElementById('recap-section').style.display = 'flex';
+                    document.querySelectorAll('.stack-item').forEach((it, idx) => {
+                        setTimeout(() => { it.classList.add('show'); it.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, idx * 10000);
+                    });
+                }, 1000);
+            }, 1000);
+        }
+
+        function moveBtn() {
+            const b = document.getElementById('btnPacar'); b.style.position = 'fixed';
+            b.style.left = Math.random() * (window.innerWidth - 100) + 'px';
+            b.style.top = Math.random() * (window.innerHeight - 100) + 'px';
+        }
+
+        function goFinal() { window.scrollTo(0,0); document.getElementById('recap-section').style.display = 'none'; document.getElementById('final-slide').style.display = 'flex'; }
+
+        function showResetCover(choice) {
+            document.getElementById('final-msg').innerText = "Kita temen wlee 😛";
+            document.getElementById('reset-cover').style.display = 'flex';
+            setTimeout(() => { window.open('https://wa.me/6282125039170?text=Hai teman! 👋', '_blank'); }, 2000);
+        }
+    </script>
+</body>
+      </html>
+      
